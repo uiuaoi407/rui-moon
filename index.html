@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>전가서 "월린기기" 캐릭터 과몰입 대작전!</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+
+    <script>
+        /* ==========================================================
+         * Copyright © 2026 모카크림의밤산책. All rights reserved.
+         * Fan-made Archive Project - Protected Version
+         * ========================================================== */
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I')) {
+                event.preventDefault();
+            }
+        });
+    </script>
+
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #000; color: white; text-align: center; margin: 0; overflow: hidden; touch-action: none; }
+        h1 { margin: 8px 0; font-size: 18px; color: #ff79c6; } /* 포인트 컬러 살짝 주면 더 이쁩니다! */
+        
+        #top-info-panel {
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 6px; font-size: 15px; font-weight: bold; z-index: 2; position: relative;
+        }
+        
+        #game-container { 
+            position: relative; width: 85vw; max-width: 390px; height: 70vh; 
+            background-color: #000; background-size: cover; background-position: center;
+            margin: 0 auto 10px auto; border: 3px solid #555; border-radius: 10px; overflow: hidden; 
+            touch-action: none; transition: background-image 0.5s ease;
+        }
+
+        #game-container.flash-effect {
+            animation: flashBorder 0.5s ease infinite alternate;
+        }
+        @keyframes flashBorder {
+            0% { border-color: #555; box-shadow: inset 0 0 0px rgba(255,255,255,0); }
+            100% { border-color: #ff007f; box-shadow: inset 0 0 20px #ff007f, 0 0 20px #ff007f; }
+        }
+
+        .fruit-drop { 
+            position: absolute; border-radius: 50%; 
+            border: 2px solid white; 
+            box-sizing: border-box; 
+            background-size: cover; background-position: center; 
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; color: black;
+            transform: translate(-50%, -50%); pointer-events: none;
+        }
+
+        #watermark { position: absolute; bottom: 8px; right: 10px; color: rgba(255, 255, 255, 0.6); font-size: 11px; z-index: 6; pointer-events: none; }
+
+        .screen-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0, 0.82);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; 
+        }
+        button { padding: 12px 35px; font-size: 18px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 10px; font-weight: bold; }
+        .copyright-text { margin-top: 15px; font-size: 11px; color: rgba(255, 255, 255, 0.6); }
+        
+        #global-plays {
+            margin-top: 12px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦊 전가서 "월린기기" 캐릭터 과몰입 대작전! 🦊</h1>
+    
+    <div id="top-info-panel">
+        <div>점수: <span id="score">0</span> | 최고: <span id="best-score">0</span></div>
+    </div>
+
+    <audio id="bgm" src="수박배경음악.mp3" loop></audio>
+    <audio id="event-sound" src="이벤트효과음.mp3"></audio>
+
+    <div id="game-container">
+        <div id="watermark">모카크림의 밤산책</div>
+        <div id="start-screen" class="screen-overlay">
+            <h2>캐릭터 열전 시작하기</h2>
+            <button onclick="firstStartGame()">게임 시작!</button>
+            <div id="global-plays"> 총 플레이: <span id="play-count-num">불러오는 중...</span>회</div>
+            <div class="copyright-text">© 2026 모카크림의밤산책. Fan-made project.</div>
+        </div>
+        <div id="game-over" class="screen-overlay" style="display: none;">
+            <h2>게임 오버 😵</h2>
+            <p id="final-score"></p>
+            <p id="new-record-notice" style="color: #f1c40f; font-weight: bold; display: none;">🎉 최고 기록 경신! 🎉</p>
+            <button onclick="restartGame()">다시 시작하기</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
