@@ -8,7 +8,6 @@ const eventSound = document.getElementById("event-sound");
 const playCountNumEl = document.getElementById("play-count-num");
 
 // 전 세계 총 플레이 카운트 API 연동 (CounterAPI 활용)
-// 네임스페이스와 키는 고유값으로 자동 생성되어 전 세계 누적 횟수를 기록합니다.
 const API_NAMESPACE = "jeongaseo_subak_game_2026";
 const API_KEY = "total_plays";
 
@@ -26,12 +25,11 @@ function fetchAndUpdatePlayCount(increment = false) {
         })
         .catch(() => {
             if (playCountNumEl) {
-                playCountNumEl.innerText = "1,254+"; // 네트워크 오류 대비 대체 텍스트
+                playCountNumEl.innerText = "1,254+"; 
             }
         });
 }
 
-// 페이지가 로드되자마자 현재 누적 횟수 조회
 fetchAndUpdatePlayCount(false);
 
 const fruitTypes = [
@@ -56,13 +54,25 @@ let gameOverTimer = 0;
 let eventIndex = 1;
 let isEventActive = false;
 let eventTimer = null;
+let lastBgIndex = -1; // 직전에 나온 배경과 중복되는 것을 방지하기 위한 변수
 
 let engine, runner;
 let ballMap = new Map();
 
+// 💡 배경 30장 중 500점마다 랜덤 변경 (직전 배경과 중복 회피 기능 추가!)
 function updateBackground() {
     if (isEventActive) return;
-    let bgIdx = (Math.floor(score / 1000) % 5) + 1;
+    
+    // 점수가 500점 오를 때마다 구간 변경 (0~499점: 1구간, 500~999점: 2구간...)
+    let currentTier = Math.floor(score / 500);
+    
+    // 1부터 30까지의 랜덤 번호 뽑기 (직전에 나왔던 배경 번호와 같으면 안 겹치게 다시 뽑기)
+    let bgIdx;
+    do {
+        bgIdx = Math.floor(Math.random() * 30) + 1;
+    } while (bgIdx === lastBgIndex && 30 > 1);
+    
+    lastBgIndex = bgIdx;
     container.style.backgroundImage = `url('배경${bgIdx}.jpg')`;
 }
 
@@ -70,7 +80,6 @@ function playBgm() { bgm.pause(); bgm.currentTime = 0; bgm.play().catch(() => {}
 
 function firstStartGame() { 
     document.getElementById("start-screen").style.display = "none"; 
-    // 게임 시작 버튼을 누를 때 전 세계 플레이 횟수 1 증가시키며 반영
     fetchAndUpdatePlayCount(true);
     playBgm(); 
     runGame(); 
@@ -78,7 +87,6 @@ function firstStartGame() {
 
 function restartGame() { 
     document.getElementById("game-over").style.display = "none"; 
-    // 재시작할 때도 플레이 횟수 증가 반영
     fetchAndUpdatePlayCount(true);
     playBgm(); 
     runGame(); 
@@ -128,7 +136,10 @@ function initPhysics() {
                 removeBall(bodyA);
                 removeBall(bodyB);
 
+                let oldTier = Math.floor(score / 500);
                 score += fruitTypes[level - 1].score * 2;
+                let newTier = Math.floor(score / 500);
+
                 scoreEl.innerText = score;
 
                 if (score > bestScore) {
@@ -139,7 +150,8 @@ function initPhysics() {
 
                 if (level === 7) {
                     triggerEventCutscene();
-                } else {
+                } else if (newTier > oldTier) {
+                    // 점수 구간(500점 단위)이 바뀔 때마다 배경 랜덤 갱신!
                     updateBackground();
                 }
 
